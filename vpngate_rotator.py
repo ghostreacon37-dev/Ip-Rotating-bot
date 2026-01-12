@@ -1,7 +1,14 @@
 import base64, csv, os, random, signal, subprocess, time, urllib.request, json
 
 # Pick your target countries (VPN Gate uses country short codes like US, JP, KR, DE, FR, GB, NL, CA, AU, SG...)
-TARGET_COUNTRIES = {"US", "GB", "CA", "DE", "FR", "NL", "AU", "SG", "JP", "KR"}
+TARGET_COUNTRIES = TARGET_COUNTRIES = {
+    "US", "GB", "CA", "DE", "FR", "NL", "AU", "SG", "JP", "KR",
+    "IT", "ES", "SE", "NO", "FI", "IE",
+    "PL", "CZ", "AT", "CH",
+    "IN", "MY", "TH", "ID", "VN", "PH",
+    "BR", "MX"
+}
+
 ROTATE_EVERY_SECONDS = 300   # 5 minutes
 CONNECT_TIMEOUT = 45         # seconds
 
