@@ -49,10 +49,10 @@ while read -r proxy; do
         echo "WORKING"
         echo "$proxy" >> "workingproxy/https.txt"
     fi
-    if
+    
         # If none of the above work, mark as DEAD
         echo "DEAD"
-    fi
+    
 done < "$ALL"
 
 echo
