@@ -26,12 +26,21 @@ set_system_proxy() {
 
     echo
     echo "[+] Proxy set successfully:"
-    echo "    http_proxy=$http_proxy"
-    echo "    https_proxy=$https_proxy"
+    echo "    $proxy"
 }
 
-echo "[+] Trying HTTP proxies..."
-while read -r proxy; do
+
+mapfile -t PROXIES < <(cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null | sort -u | shuf)
+
+if [ "${#PROXIES[@]}" -eq 0 ]; then
+    echo "[-] No proxies found"
+    return 1
+fi
+
+echo "[+] Selecting a random proxy..."
+
+
+for proxy in "${PROXIES[@]}"; do
     echo -n "Testing $proxy ... "
 
     if check_proxy "$proxy"; then
@@ -41,21 +50,7 @@ while read -r proxy; do
     else
         echo "DEAD"
     fi
-done < "$HTTP_FILE"
-
-echo
-echo "[+] Trying HTTPS proxies..."
-while read -r proxy; do
-    echo -n "Testing $proxy ... "
-
-    if check_proxy "$proxy"; then
-        echo "WORKING"
-        set_system_proxy "$proxy"
-        return 0
-    else
-        echo "DEAD"
-    fi
-done < "$HTTPS_FILE"
+done
 
 echo
 echo "[-] No working proxy found"
