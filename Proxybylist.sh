@@ -35,15 +35,15 @@ while read -r proxy; do
         echo "$proxy" >> "workingproxy/http.txt"
     fi
     # Second attempt with socks4
-    if curl -s --proxy "socks4://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
-        echo "WORKING"
-        echo "$proxy" >> "workingproxy/socks4.txt"
-    fi
-    # Third attempt with socks5
-    if curl -s --proxy "socks5://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
-        echo "WORKING"
-        echo "$proxy" >> "workingproxy/socks5.txt"
-    fi
+    # if curl -s --proxy "socks4://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
+    #     echo "WORKING"
+    #     echo "$proxy" >> "workingproxy/socks4.txt"
+    # fi
+    # # Third attempt with socks5
+    # if curl -s --proxy "socks5://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
+    #     echo "WORKING"
+    #     echo "$proxy" >> "workingproxy/socks5.txt"
+    # fi
     # Fourth attempt with https
     if curl -s --proxy "https://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
         echo "WORKING"
