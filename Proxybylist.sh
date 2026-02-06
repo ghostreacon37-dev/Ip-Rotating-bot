@@ -33,19 +33,23 @@ while read -r proxy; do
     if curl -s --proxy "http://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
         echo "WORKING"
         echo "$proxy" >> "workingproxy/http.txt"
+    fi
     # Second attempt with socks4
-    elif curl -s --proxy "socks4://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
+    if curl -s --proxy "socks4://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
         echo "WORKING"
         echo "$proxy" >> "workingproxy/socks4.txt"
+    fi
     # Third attempt with socks5
-    elif curl -s --proxy "socks5://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
+    if curl -s --proxy "socks5://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
         echo "WORKING"
         echo "$proxy" >> "workingproxy/socks5.txt"
+    fi
     # Fourth attempt with https
-    elif curl -s --proxy "https://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
+    if curl -s --proxy "https://$proxy" --max-time 5 https://api.ipify.org >/dev/null 2>&1; then
         echo "WORKING"
         echo "$proxy" >> "workingproxy/https.txt"
-    else
+    fi
+    if
         # If none of the above work, mark as DEAD
         echo "DEAD"
     fi
