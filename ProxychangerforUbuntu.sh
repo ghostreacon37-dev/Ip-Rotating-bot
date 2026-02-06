@@ -6,6 +6,7 @@ HTTPS_FILE="workingproxy/https.txt"
 TEST_URL="https://api.ipify.org"
 TIMEOUT=5
 
+
 check_proxy() {
     local proxy=$1
 
@@ -16,25 +17,42 @@ check_proxy() {
          "$TEST_URL" >/dev/null 2>&1
 }
 
-set_system_proxy() {
+
+set_env_proxy() {
     local proxy=$1
 
     export http_proxy="http://$proxy"
     export https_proxy="http://$proxy"
     export HTTP_PROXY="http://$proxy"
     export HTTPS_PROXY="http://$proxy"
-
-    echo
-    echo "[+] Proxy set successfully:"
-    echo "    $proxy"
 }
 
 
-mapfile -t PROXIES < <(cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null | sort -u | shuf)
+set_gnome_proxy() {
+    local proxy=$1
+    local ip="${proxy%:*}"
+    local port="${proxy#*:}"
+
+    gsettings set org.gnome.system.proxy mode 'manual'
+
+    gsettings set org.gnome.system.proxy.http host "$ip"
+    gsettings set org.gnome.system.proxy.http port "$port"
+
+    gsettings set org.gnome.system.proxy.https host "$ip"
+    gsettings set org.gnome.system.proxy.https port "$port"
+}
+
+
+mapfile -t PROXIES < <(
+    cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null |
+    grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+$' |
+    sort -u |
+    shuf
+)
 
 if [ "${#PROXIES[@]}" -eq 0 ]; then
     echo "[-] No proxies found"
-    return 1
+    exit 1
 fi
 
 echo "[+] Selecting a random proxy..."
@@ -45,8 +63,17 @@ for proxy in "${PROXIES[@]}"; do
 
     if check_proxy "$proxy"; then
         echo "WORKING"
-        set_system_proxy "$proxy"
-        return 0
+
+        set_env_proxy "$proxy"
+        set_gnome_proxy "$proxy"
+
+        echo
+        echo "[+] Proxy applied successfully:"
+        echo "    IP   : ${proxy%:*}"
+        echo "    Port : ${proxy#*:}"
+        echo "    GNOME + Terminal updated"
+
+        exit 0
     else
         echo "DEAD"
     fi
@@ -54,4 +81,4 @@ done
 
 echo
 echo "[-] No working proxy found"
-return 1
+exit 1
