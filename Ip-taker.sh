@@ -4,8 +4,6 @@ URL="https://free-proxy-list.net/en/"
 ALL="proxies_all.txt"
 
 mkdir -p workingproxy
-rm -f workingproxy/http.txt workingproxy/https.txt
-
 
 curl -s "$URL" |
 awk '
