@@ -16,5 +16,5 @@ do
     fi
 
     # Wait for 20 minutes (1200 seconds)
-    sleep 120
+    sleep 600000
 done
