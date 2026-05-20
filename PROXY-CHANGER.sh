@@ -10,11 +10,13 @@ TIMEOUT=5
 check_proxy() {
     local proxy=$1
 
+    # Modified to return the total time taken for the request
     curl --silent --fail \
          --proxy "http://$proxy" \
          --connect-timeout "$TIMEOUT" \
          --max-time "$TIMEOUT" \
-         "$TEST_URL" >/dev/null 2>&1
+         -w "%{time_total}" \
+         "$TEST_URL" -o /dev/null 2>&1
 }
 
 
@@ -43,26 +45,18 @@ set_gnome_proxy() {
 }
 
 
-mapfile -t PROXIES < <(
-    cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null |
-    grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+' |
-    sort -u |
-    shuf
-)
-
-if [ "${#PROXIES[@]}" -eq 0 ]; then
-    echo "[-] No proxies found"
-    exit 1
-fi
-
 echo "[+] Selecting a random proxy..."
 
-
-for proxy in "${PROXIES[@]}"; do
+# Changed from mapfile to a while loop with process substitution for real-time file reading
+while read -r proxy; do
     echo -n "Testing $proxy ... "
 
-    if check_proxy "$proxy"; then
-        echo "WORKING"
+    # Capture the speed (time_total) from the check_proxy function
+    speed=$(check_proxy "$proxy")
+
+    # Check if proxy is working AND if speed is 2.0 seconds or less
+    if [ -n "$speed" ] && [ "$(echo "$speed <= 2.0" | awk '{print ($1 <= 2.0)}')" -eq 1 ]; then
+        echo "WORKING (Speed: ${speed}s)"
 
         set_env_proxy "$proxy"
         set_gnome_proxy "$proxy"
@@ -71,14 +65,15 @@ for proxy in "${PROXIES[@]}"; do
         echo "[+] Proxy applied successfully:"
         echo "    IP   : ${proxy%:*}"
         echo "    Port : ${proxy#*:}"
+        echo "    Speed: ${speed}s"
         echo "    GNOME + Terminal updated"
 
         exit 0
     else
-        echo "DEAD"
+        echo "DEAD/SLOW"
     fi
-done
+done < <(cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+' | sort -u | shuf)
 
 echo
-echo "[-] No working proxy found"
+echo "[-] No working fast proxy found"
 exit 1
