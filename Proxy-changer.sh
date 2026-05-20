@@ -45,7 +45,7 @@ set_gnome_proxy() {
 
 mapfile -t PROXIES < <(
     cat "$HTTP_FILE" "$HTTPS_FILE" 2>/dev/null |
-    grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+$' |
+    grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+' |
     sort -u |
     shuf
 )
