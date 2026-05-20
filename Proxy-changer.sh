@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HTTP_FILE="workingproxy/http.txt"
-HTTPS_FILE="workingproxy/https.txt"
+HTTP_FILE="Ip-bot-2.0/http.txt"
+HTTPS_FILE="Ip-bot-2.0/https.txt"
 
 TEST_URL="https://api.ipify.org"
 TIMEOUT=5
